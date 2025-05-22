@@ -1,10 +1,9 @@
 CREATE TABLE agendamentos (
-    id BIGSERIAL PRIMARY KEY, -- BIGSERIAL é um tipo do PostgreSQL que cria um ID automático e sequencial
-    id_paciente_fk INT,
-    data_hora TIMESTAMP WITHOUT TIME ZONE NOT NULL, -- TIMESTAMP para data e hora
-    observacoes VARCHAR(255)
-);
--- Definindo a Chave Estrangeira (Foreign Key)
+    id BIGSERIAL PRIMARY KEY,
+    paciente_id BIGINT NOT NULL, -- Use o nome que você usou no Agendamento.java para clareza
+    data_hora TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    observacoes VARCHAR(255),
     CONSTRAINT fk_agendamento_paciente
-        FOREIGN KEY (id_paciente_fk)
+        FOREIGN KEY (paciente_id)
         REFERENCES pacientes(id)
+);
