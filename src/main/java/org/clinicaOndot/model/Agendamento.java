@@ -15,7 +15,7 @@ public class Agendamento extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Setter
-    private  Long id;
+    private Long id;
 
     @ManyToOne // Muitos agendamentos podem ter um paciente (Many agendamentos TO One paciente)
     @JoinColumn(name = "paciente_id", nullable = false) // Define a coluna da chave estrangeira no DB

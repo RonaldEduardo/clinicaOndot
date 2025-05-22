@@ -2,13 +2,16 @@ package org.clinicaOndot.resource;
 
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.clinicaOndot.model.Agendamento;
 import org.clinicaOndot.model.Paciente;
 
 import java.util.List;
 import java.util.Optional;
-
+@Path("/pacientes")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class PacienteResource {
     @POST
     @Transactional
