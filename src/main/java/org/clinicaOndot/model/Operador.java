@@ -20,10 +20,6 @@ import java.time.LocalDateTime;
         )
 })
 public class Operador extends Pessoa {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(nullable = false) // Novo campo para indicar se o paciente está ativo
     private boolean ativo; // true = ativo, false = inativo
 

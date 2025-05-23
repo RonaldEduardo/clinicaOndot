@@ -29,9 +29,8 @@ public class Agendamento extends PanacheEntityBase {
     private String observacoes;
 
     @ManyToOne
-    @Column(name = "status_agendamento")
+    @JoinColumn(name = "status_agendamento_id")
     private StatusAgendamento status;
-
 
     // Construtor vazio
     public Agendamento() {

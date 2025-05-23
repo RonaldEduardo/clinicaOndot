@@ -1,0 +1,6 @@
+CREATE TABLE operadores (
+    id BIGSERIAL PRIMARY KEY,
+    nome_completo VARCHAR(100) NOT NULL,
+    cro VARCHAR(14) UNIQUE,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE
+);
