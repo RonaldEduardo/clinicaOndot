@@ -91,9 +91,12 @@ public class AgendamentoResource {
             }
             agendamentoExistente.setStatus(newStatus);
         }
-        // ... (resto do método PUT) ...
-        agendamentoExistente.setDataHora(request.getDataHora());
-        agendamentoExistente.setObservacoes(request.getObservacoes());
+        if (request.getDataHora() != null) { // Adicionamos esta verificação!
+            agendamentoExistente.setDataHora(request.getDataHora());
+        }
+        if (request.getObservacoes() != null) { // Opcional: fazer o mesmo para observacoes se ela também puder ser nula na requisição
+            agendamentoExistente.setObservacoes(request.getObservacoes());
+        }
 
         return Response.ok(agendamentoExistente).build();
     }
