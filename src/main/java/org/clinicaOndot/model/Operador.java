@@ -28,8 +28,7 @@ public class Operador extends Pessoa {
         super();
     }
 
-    public Operador(String nomeCompleto, String documento) {
-        super(nomeCompleto, documento);
-        this.ativo = true;
+    public Operador(String nomeCompleto, String documento, boolean ativo) {
+        super(nomeCompleto, documento, ativo);
     }
 }

@@ -14,7 +14,7 @@ public class StatusAgendamento extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "descricao", nullable = false)
+    @Column(name = "descricao", nullable = false, length = 20)
     private String descricao;
 
     // Construtor vazio

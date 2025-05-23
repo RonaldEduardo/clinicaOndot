@@ -12,16 +12,12 @@ import lombok.ToString;
 @Getter
 @Setter
 public class Paciente extends Pessoa {
-    @Column(nullable = false) // Novo campo para indicar se o paciente está ativo
-    private boolean ativo; // true = ativo, false = inativo
-
     public Paciente() {
         super();
     }
 
     // Construtor com parâmetros
-    public Paciente(String nomeCompleto, String documento) {
-        super(nomeCompleto, documento);
-        this.ativo = true;
+    public Paciente(String nomeCompleto, String documento, boolean ativo) {
+        super(nomeCompleto, documento, ativo);
     }
 }

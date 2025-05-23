@@ -22,6 +22,12 @@ public class Agendamento extends PanacheEntityBase {
     @JoinColumn(name = "paciente_id", nullable = false) // Define a coluna da chave estrangeira no DB
     private Paciente paciente; // Agendamento tem um objeto Paciente
 
+    @ManyToOne
+    @JoinColumn(name = "operador_id", nullable = true) // Ou false, dependendo da regra de negócio
+    @Getter
+    @Setter
+    private Operador operador;
+
     @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
@@ -29,7 +35,7 @@ public class Agendamento extends PanacheEntityBase {
     private String observacoes;
 
     @ManyToOne
-    @JoinColumn(name = "status_agendamento_id")
+    @JoinColumn(name = "status_agendamento_id", nullable = false)
     private StatusAgendamento status;
 
     // Construtor vazio

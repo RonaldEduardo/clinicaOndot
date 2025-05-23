@@ -20,6 +20,8 @@ public class AgendamentoRequest {
     // Observações, que podem ser opcionais
     public String observacoes;
 
+    public Long statusAgendamentoId;
+
     // Construtor vazio, necessário para a desserialização do JSON
     public AgendamentoRequest() {
     }

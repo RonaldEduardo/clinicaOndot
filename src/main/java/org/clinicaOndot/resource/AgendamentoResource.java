@@ -7,6 +7,7 @@ import jakarta.ws.rs.*; // Importe as anotações JAX-RS
 import jakarta.ws.rs.core.MediaType; // Para definir o tipo de conteúdo (JSON)
 import jakarta.ws.rs.core.Response; // Para retornar respostas HTTP
 import org.clinicaOndot.model.Paciente;
+import org.clinicaOndot.model.StatusAgendamento;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,10 +27,17 @@ public class AgendamentoResource {
                     .entity("Paciente com ID " + request.getPacienteId() + " não encontrado.")
                     .build();
         }
+        StatusAgendamento status = StatusAgendamento.findById(request.getStatusAgendamentoId());
+        if (status == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Status com ID " + request.getStatusAgendamentoId() + " não encontrado.")
+                    .build();
+        }
         Agendamento agendamento = new Agendamento();
         agendamento.setPaciente(paciente); // Associa o objeto Paciente encontrado
         agendamento.setDataHora(request.getDataHora());
         agendamento.setObservacoes(request.getObservacoes());
+        agendamento.setStatus(status);
 
         agendamento.persist(); // usando o panche para salver os dados no banco
         // Retorna uma resposta 201 Created, com o agendamento salvo no corpo da resposta
@@ -60,25 +68,33 @@ public class AgendamentoResource {
         Agendamento agendamentoExistente = Agendamento.findById(id);
 
         if (agendamentoExistente == null) {
-            // Se não encontrou, retorna 404 Not Found
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        if(request.getPacienteId() != null){
+        if (request.getPacienteId() != null) {
             Paciente newPaciente = Paciente.findById(request.getPacienteId());
-            if(newPaciente == null){
+            if (newPaciente == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Paciente com ID " + request.getPacienteId() + " não encontrado para atualização.")
                         .build();
             }
-            // Atualiza os outros campos do agendamento
-            agendamentoExistente.setDataHora(request.getDataHora());
-            agendamentoExistente.setObservacoes(request.getObservacoes());
-
             agendamentoExistente.setPaciente(newPaciente);
         }
-        // Cria logica para alteracao
-        // Retorna 200 OK com o agendamento atualizado
+
+        // **MUDANÇA AQUI NO PUT:**
+        if (request.getStatusAgendamentoId() != null) { // <--- Verificar se o ID não é nulo
+            StatusAgendamento newStatus = StatusAgendamento.findById(request.getStatusAgendamentoId()); // <--- Passar o ID numérico
+            if (newStatus == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Status com ID " + request.getStatusAgendamentoId() + " não encontrado para atualização.") // Use o ID correto
+                        .build();
+            }
+            agendamentoExistente.setStatus(newStatus);
+        }
+        // ... (resto do método PUT) ...
+        agendamentoExistente.setDataHora(request.getDataHora());
+        agendamentoExistente.setObservacoes(request.getObservacoes());
+
         return Response.ok(agendamentoExistente).build();
     }
 
