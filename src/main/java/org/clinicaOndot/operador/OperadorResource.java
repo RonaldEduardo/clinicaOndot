@@ -1,12 +1,10 @@
-package org.clinicaOndot.resource;
+package org.clinicaOndot.operador;
 
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.clinicaOndot.model.Agendamento;
-import org.clinicaOndot.model.Operador;
-import org.clinicaOndot.model.Paciente;
+import org.clinicaOndot.agendamento.Agendamento;
 
 import java.util.List;
 import java.util.Optional;

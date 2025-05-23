@@ -1,5 +1,5 @@
 // src/main/java/org/clinicaOndot/model/Pessoa.java (SUGESTÃO DE MUDANÇA)
-package org.clinicaOndot.model;
+package org.clinicaOndot.common;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;

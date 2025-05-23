@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class AgendamentoRequest {
+public class AgendamentoRequestDto {
     // Queremos receber apenas o ID do paciente, não o objeto Paciente completo
     public Long pacienteId;
 
@@ -23,6 +23,6 @@ public class AgendamentoRequest {
     public Long statusAgendamentoId;
 
     // Construtor vazio, necessário para a desserialização do JSON
-    public AgendamentoRequest() {
+    public AgendamentoRequestDto() {
     }
 }

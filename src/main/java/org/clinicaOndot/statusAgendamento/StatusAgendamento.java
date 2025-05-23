@@ -1,4 +1,4 @@
-package org.clinicaOndot.model;
+package org.clinicaOndot.statusAgendamento;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;

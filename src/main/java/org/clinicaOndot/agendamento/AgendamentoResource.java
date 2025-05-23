@@ -1,15 +1,13 @@
-package org.clinicaOndot.resource;
+package org.clinicaOndot.agendamento;
 
-import org.clinicaOndot.dto.AgendamentoRequest;
-import org.clinicaOndot.model.Agendamento; // Importe a entidade que criamos
 import jakarta.transaction.Transactional; // Importe para garantir operações de DB dentro de uma transação
 import jakarta.ws.rs.*; // Importe as anotações JAX-RS
 import jakarta.ws.rs.core.MediaType; // Para definir o tipo de conteúdo (JSON)
 import jakarta.ws.rs.core.Response; // Para retornar respostas HTTP
-import org.clinicaOndot.model.Paciente;
-import org.clinicaOndot.model.StatusAgendamento;
+import org.clinicaOndot.dto.AgendamentoRequestDto;
+import org.clinicaOndot.paciente.Paciente;
+import org.clinicaOndot.statusAgendamento.StatusAgendamento;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional; // Para lidar com a possibilidade de não encontrar um agendamento
 
@@ -17,9 +15,8 @@ import java.util.Optional; // Para lidar com a possibilidade de não encontrar u
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class AgendamentoResource {
-    @POST
     @Transactional
-    public Response criarAgendamento(AgendamentoRequest request) {
+    public Response criarAgendamento(AgendamentoRequestDto request) {
         Paciente paciente = Paciente.findById(request.getPacienteId());
         if (paciente == null) {
             // Se o paciente não for encontrado, retorna um erro 400 Bad Request
@@ -44,13 +41,10 @@ public class AgendamentoResource {
         return Response.status(Response.Status.CREATED).entity(agendamento).build();
     }
 
-    @GET
     public List<Agendamento> listarAgendamento() {
         return Agendamento.listAll();
     }
 
-    @GET
-    @Path("/{id}")
     public Response buscarAgendamentoPorId(@PathParam("id") Long id) {
         Optional<Agendamento> agendamento = Agendamento.findByIdOptional(id);
 
@@ -61,10 +55,8 @@ public class AgendamentoResource {
         return Response.ok(agendamento.get()).build();
     }
 
-    @PUT
-    @Path("/{id}")
     @Transactional
-    public Response atualizarAgendamento(@PathParam("id") Long id, AgendamentoRequest request) {
+    public Response atualizarAgendamento(@PathParam("id") Long id, AgendamentoRequestDto request) {
         Agendamento agendamentoExistente = Agendamento.findById(id);
 
         if (agendamentoExistente == null) {
@@ -101,8 +93,6 @@ public class AgendamentoResource {
         return Response.ok(agendamentoExistente).build();
     }
 
-    @DELETE // HTTP DELETE para remover um recurso
-    @Path("/{id}")
     @Transactional
     public Response deletarAgendamento(@PathParam("id") Long id) {
         boolean deleted = Agendamento.deleteById(id);

@@ -1,10 +1,13 @@
-package org.clinicaOndot.model;
+package org.clinicaOndot.agendamento;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import  jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.clinicaOndot.operador.Operador;
+import org.clinicaOndot.statusAgendamento.StatusAgendamento;
+import org.clinicaOndot.paciente.Paciente;
 
 import java.time.LocalDateTime;
 @Entity
@@ -23,7 +26,7 @@ public class Agendamento extends PanacheEntityBase {
     private Paciente paciente; // Agendamento tem um objeto Paciente
 
     @ManyToOne
-    @JoinColumn(name = "operador_id", nullable = true) // Ou false, dependendo da regra de negócio
+    @JoinColumn(name = "operador_id") // Ou false, dependendo da regra de negócio
     @Getter
     @Setter
     private Operador operador;
@@ -31,7 +34,7 @@ public class Agendamento extends PanacheEntityBase {
     @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
-    @Column(length = 255)
+    @Column(name = "observacoes")
     private String observacoes;
 
     @ManyToOne

@@ -1,11 +1,10 @@
-package org.clinicaOndot.model;
+package org.clinicaOndot.operador;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
+import org.clinicaOndot.common.Pessoa;
 
 @Entity
 @Table(name = "operadores")

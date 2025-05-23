@@ -1,9 +1,10 @@
-package org.clinicaOndot.model; // OU seu pacote
+package org.clinicaOndot.paciente; // OU seu pacote
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.clinicaOndot.common.Pessoa;
 
 @Entity
 @Table(name = "pacientes")
