@@ -5,78 +5,78 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.clinicaOndot.model.Agendamento;
+import org.clinicaOndot.model.Operador;
 import org.clinicaOndot.model.Paciente;
 
 import java.util.List;
 import java.util.Optional;
 
-@Path("/pacientes")
+@Path("/operadores")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class PacienteResource {
+public class OperadorResource {
     @POST
     @Transactional
-    public Response criarPaciente(Paciente paciente) {
-        paciente.persist();
+    public Response criarOperador(Operador operador) {
+        operador.persist();
 
         return Response.status(Response.Status.CREATED).build();
     }
 
     @GET
-    public List<Paciente> listarPacientes() {
-        return Paciente.listAll();
+    public List<Operador> listarOperadores() {
+        return Operador.listAll();
     }
 
     @GET
     @Path("/{id}")
-    public Response listarPaciente(@PathParam("id") Long id) {
-        Optional<Paciente> paciente = Paciente.findByIdOptional(id);
+    public Response listarOperador(@PathParam("id") Long id) {
+        Optional<Operador> operador = Operador.findByIdOptional(id);
 
-        if (paciente.isEmpty()) {
+        if (operador.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        return Response.ok(paciente.get()).build();
+        return Response.ok(operador.get()).build();
     }
 
     @PUT
     @Path("/{id}")
     @Transactional
-    public Response atualizarPaciente(@PathParam("id") Long id, Paciente pacienteAtualizado) {
-        Paciente pacienteExistente = Paciente.findById(id);
+    public Response atualizarOperador(@PathParam("id") Long id, Operador operadorAtualizado) {
+        Operador operadorExistente = Operador.findById(id);
 
-        if (pacienteExistente == null) {
+        if (operadorExistente == null) {
             // Se não encontrou, retorna 404 Not Found
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        pacienteExistente.setNomeCompleto(pacienteAtualizado.getNomeCompleto());
-        pacienteExistente.setDocumento(pacienteAtualizado.getDocumento());
+        operadorExistente.setNomeCompleto(operadorAtualizado.getNomeCompleto());
+        operadorExistente.setDocumento(operadorAtualizado.getDocumento());
         // Não precisa de persist() aqui pois o Panache gerencia dentro da transação
-        return Response.ok(pacienteExistente).build();
+        return Response.ok(operadorExistente).build();
     }
 
     @DELETE // HTTP DELETE para remover um recurso
     @Path("/{id}")
     @Transactional
-    public Response deletarPaciente(@PathParam("id") Long id) {
-        Paciente paciente = Paciente.findById(id);
+    public Response deletarOperador(@PathParam("id") Long id) {
+        Operador operador = Operador.findById(id);
 
-        if (paciente == null) {
+        if (operador == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        long agendamentosVinculados = Agendamento.count("paciente", paciente);
+        long agendamentosVinculados = Agendamento.count("operador", operador);
 
         if (agendamentosVinculados > 0) {
-            // Se houver agendamentos, desativar o paciente (soft delete)
-            paciente.setAtivo(false); // Altera o status para inativo
+            operador.setAtivo(false); // Altera o status para inativo
             // O Hibernate salva automaticamente a mudança porque estamos em uma transação
-            return Response.ok("Paciente desativado. Existem " + agendamentosVinculados + " agendamento(s) vinculado(s).")
+            return Response.ok("Operador desativado. Existem " + agendamentosVinculados + " agendamento(s) vinculado(s).")
                     .build();
         }
         // Se não houver agendamentos, realizar a exclusão física
-        paciente.delete(); // Exclusão física usando Panache
+        operador.delete(); // Exclusão física usando Panache
         return Response.noContent().build(); // Retorna 204 No Content para sucesso de exclusão
     }
 }
