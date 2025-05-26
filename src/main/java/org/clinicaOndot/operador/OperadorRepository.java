@@ -1,4 +1,6 @@
 package org.clinicaOndot.operador;
 
-public class OperadorRepository {
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
+
+public class OperadorRepository implements PanacheRepository<Operador> {
 }

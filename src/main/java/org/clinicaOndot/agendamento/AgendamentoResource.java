@@ -1,82 +1,86 @@
 package org.clinicaOndot.agendamento;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional; // Importe para garantir operações de DB dentro de uma transação
 import jakarta.validation.Valid;
-import jakarta.ws.rs.*; // Importe as anotações JAX-RS
-import jakarta.ws.rs.core.Response; // Para retornar respostas HTTP
+import jakarta.ws.rs.BadRequestException;
+import org.clinicaOndot.agendamento.status.AgendamentoStatusRepository;
 import org.clinicaOndot.paciente.Paciente;
-import org.clinicaOndot.statusAgendamento.StatusAgendamento;
+import org.clinicaOndot.agendamento.status.AgendamentoStatus;
+import org.clinicaOndot.paciente.PacienteRepository;
 
 import java.util.List;
 import java.util.Optional; // Para lidar com a possibilidade de não encontrar um agendamento
 
 @RequestScoped
 public class AgendamentoResource {
-    @Transactional
-    public Response criar(@Valid AgendamentoRequestDto request) {
-        Paciente paciente = Paciente.findById(request.getPacienteId());
-        if (paciente == null) {
-            // Se o paciente não for encontrado, retorna um erro 400 Bad Request
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Paciente com ID " + request.getPacienteId() + " não encontrado.")
-                    .build();
-        }
-        StatusAgendamento status = StatusAgendamento.findById(request.getStatusAgendamentoId());
-        if (status == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Status com ID " + request.getStatusAgendamentoId() + " não encontrado.")
-                    .build();
-        }
-        Agendamento agendamento = new Agendamento();
-        agendamento.setPaciente(paciente); // Associa o objeto Paciente encontrado
-        agendamento.setDataHora(request.getDataHora());
-        agendamento.setObservacoes(request.getObservacoes());
-        agendamento.setStatus(status);
+    @Inject
+    AgendamentoRepository agendamentoRepository;
+    @Inject
+    PacienteRepository pacienteRepository;
+    @Inject
+    AgendamentoStatusRepository agendamentoStatusRepository;
 
-        agendamento.persist(); // usando o panche para salver os dados no banco
-        // Retorna uma resposta 201 Created, com o agendamento salvo no corpo da resposta
-        return Response.status(Response.Status.CREATED).entity(agendamento).build();
+    @Transactional
+    public Agendamento criar(@Valid AgendamentoRequestDto request) {
+        Paciente paciente = pacienteRepository.findById(request.getPacienteId());
+        if (paciente == null) {
+            throw new BadRequestException("Paciente com ID " + request.getPacienteId() + " não encontrado.");
+        }
+        AgendamentoStatus status = agendamentoStatusRepository.findById(request.getStatusAgendamentoId());
+        if (status == null) {
+            throw new BadRequestException("Status com ID " + request.getStatusAgendamentoId() + " não encontrado.");
+        }
+        Agendamento novoAgendamento = new Agendamento();
+        novoAgendamento.setPaciente(paciente); // Associa o objeto Paciente encontrado
+        novoAgendamento.setStatus(status);
+        novoAgendamento.setDataHora(request.getDataHora());
+        novoAgendamento.setObservacoes(request.getObservacoes());
+
+        agendamentoRepository.persist(novoAgendamento); // usando o panche para salver os dados no banco
+
+        return novoAgendamento;
     }
 
     public List<Agendamento> listar() {
-        return Agendamento.listAll();
+        return agendamentoRepository.listAll();
     }
 
-    public Response buscarPorId(Long id) {
-        Optional<Agendamento> agendamento = Agendamento.findByIdOptional(id);
-
-        if (agendamento.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        return Response.ok(agendamento.get()).build();
+    public Optional<Agendamento> buscarPorId(Long id) {
+        return agendamentoRepository.findByIdOptional(id);
     }
 
     @Transactional
-    public Response atualizar(Long id,@Valid AgendamentoRequestDto request) {
-        Agendamento agendamentoExistente = Agendamento.findById(id);
+    public Optional<Agendamento> atualizarPorId(Long id, @Valid AgendamentoRequestDto request) {
+        Optional<Agendamento> agendamentoExistenteOpt = agendamentoRepository.findByIdOptional(id);
 
-        if (agendamentoExistente == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+        if(agendamentoExistenteOpt.isEmpty()){
+            return Optional.empty();
         }
 
+        Agendamento agendamentoExistente = agendamentoExistenteOpt.get(); // Agora sabemos que existe
+
+        // 2. Atualiza o Paciente, se fornecido no request
         if (request.getPacienteId() != null) {
-            Paciente newPaciente = Paciente.findById(request.getPacienteId());
-            if (newPaciente == null) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Paciente com ID " + request.getPacienteId() + " não encontrado para atualização.")
-                        .build();
-            }
-            agendamentoExistente.setPaciente(newPaciente);
+            Paciente novoPaciente = pacienteRepository.findByIdOptional(request.getPacienteId())
+                    .orElseThrow(() -> new BadRequestException("Paciente com ID " + request.getPacienteId() + " não encontrado para atualização."));
+            agendamentoExistente.setPaciente(novoPaciente);
         }
 
-        validaRequest(request, agendamentoExistente);
+        // 3. Atualiza o Status do Agendamento, se fornecido no request
+        if (request.getStatusAgendamentoId() != null) {
+            AgendamentoStatus novoStatus = agendamentoStatusRepository.findByIdOptional(request.getStatusAgendamentoId())
+                    .orElseThrow(() -> new BadRequestException("Status de agendamento com ID " + request.getStatusAgendamentoId() + " não encontrado para atualização."));
+            agendamentoExistente.setStatus(novoStatus);
+        }
 
-        return Response.ok(agendamentoExistente).build();
+        atualizaDados(request, agendamentoExistente);
+
+        return Optional.of(agendamentoExistente);
     }
 
-    private static void validaRequest(AgendamentoRequestDto request, Agendamento agendamentoExistente) {
+    private static void atualizaDados(AgendamentoRequestDto request, Agendamento agendamentoExistente) {
 
         if (request.getDataHora() != null) { // Adicionamos esta verificação!
             agendamentoExistente.setDataHora(request.getDataHora());
@@ -87,12 +91,7 @@ public class AgendamentoResource {
     }
 
     @Transactional
-    public Response deletar(Long id) {
-        boolean deleted = Agendamento.deleteById(id);
-
-        if (!deleted) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.noContent().build();
+    public boolean deletarPorId(Long id) {
+       return agendamentoRepository.deleteById(id);
     }
 }

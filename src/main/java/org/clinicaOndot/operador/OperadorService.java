@@ -20,7 +20,9 @@ public class OperadorService {
     @POST
     @Transactional
     public Response criarOperador(OperadorRequestDto request) {
-        return operadorResource.criar(request);
+        operadorResource.criar(request);
+
+        return Response.status(Response.Status.CREATED).build();
     }
 
     @GET

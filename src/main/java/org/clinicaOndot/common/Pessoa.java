@@ -18,8 +18,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public abstract class Pessoa extends PanacheEntityBase {
-
+public abstract class Pessoa{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

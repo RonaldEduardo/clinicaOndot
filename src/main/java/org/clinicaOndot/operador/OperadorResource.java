@@ -1,6 +1,7 @@
 package org.clinicaOndot.operador;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
@@ -11,16 +12,17 @@ import java.util.Optional;
 
 @RequestScoped
 public class OperadorResource {
+    @Inject
+    OperadorRepository operadorRepository;
 
-    public Response criar(@Valid OperadorRequestDto request) {
+    public void criar(@Valid OperadorRequestDto request) {
         Operador operador = new Operador();
         operador.setAtivo(true);
         operador.setNomeCompleto(request.getNomeCompleto());
         operador.setDocumento(request.getDocumento());
 
-        operador.persist();
-
-        return Response.status(Response.Status.CREATED).build();
+        //operador.persist();
+        operadorRepository.persist(operador);
     }
 
     public List<Operador> listar() {

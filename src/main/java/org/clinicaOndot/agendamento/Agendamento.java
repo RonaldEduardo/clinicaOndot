@@ -4,12 +4,11 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import  jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.clinicaOndot.operador.Operador;
-import org.clinicaOndot.statusAgendamento.StatusAgendamento;
+import org.clinicaOndot.agendamento.status.AgendamentoStatus;
 import org.clinicaOndot.paciente.Paciente;
 
 import java.time.LocalDateTime;
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class Agendamento extends PanacheEntityBase {
+public class Agendamento{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,14 +44,14 @@ public class Agendamento extends PanacheEntityBase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_agendamento_id", nullable = false)
     @NotNull
-    private StatusAgendamento status;
+    private AgendamentoStatus status;
 
     // Construtor vazio
     public Agendamento() {
     }
 
     // Construtor com parâmetros (agora recebendo um Paciente)
-    public Agendamento(Paciente paciente, StatusAgendamento status, LocalDateTime dataHora, String observacoes) {
+    public Agendamento(Paciente paciente, AgendamentoStatus status, LocalDateTime dataHora, String observacoes) {
         this.paciente = paciente;
         this.status = status;
         this.dataHora = dataHora;
