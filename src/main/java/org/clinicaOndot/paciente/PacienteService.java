@@ -1,14 +1,10 @@
 package org.clinicaOndot.paciente;
 
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.clinicaOndot.agendamento.Agendamento;
-
 import java.util.List;
-import java.util.Optional;
 
 @Path("/pacientes")
 @Produces(MediaType.APPLICATION_JSON)

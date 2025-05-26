@@ -2,6 +2,9 @@ package org.clinicaOndot.agendamento;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import  jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,22 +26,25 @@ public class Agendamento extends PanacheEntityBase {
 
     @ManyToOne // Muitos agendamentos podem ter um paciente (Many agendamentos TO One paciente)
     @JoinColumn(name = "paciente_id", nullable = false) // Define a coluna da chave estrangeira no DB
+    @NotNull
     private Paciente paciente; // Agendamento tem um objeto Paciente
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operador_id") // Ou false, dependendo da regra de negócio
-    @Getter
-    @Setter
+    @NotNull
     private Operador operador;
 
     @Column(name = "data_hora", nullable = false)
+    @NotNull
+    @Future
     private LocalDateTime dataHora;
 
     @Column(name = "observacoes")
     private String observacoes;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_agendamento_id", nullable = false)
+    @NotNull
     private StatusAgendamento status;
 
     // Construtor vazio

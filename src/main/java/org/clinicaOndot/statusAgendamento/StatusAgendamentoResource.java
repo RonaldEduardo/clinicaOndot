@@ -1,34 +1,27 @@
 package org.clinicaOndot.statusAgendamento;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
 import java.util.List;
 import java.util.Optional;
 
-@Path("/statusAgendamento")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+
 public class StatusAgendamentoResource {
 
-    @POST
     @Transactional
-    public Response criarStatusAgendamento(StatusAgendamento status) {
-        status.persist();
+    public Response criar(@Valid StatusAgendamento novoStatus) {
+        novoStatus.persist();
 
         return Response.status(Response.Status.CREATED).build();
     }
 
-    @GET
-    public List<StatusAgendamento> listarStatusAgendamentos() {
+    public List<StatusAgendamento> listar() {
         return StatusAgendamento.listAll();
     }
 
-    @GET
-    @Path("/{id}")
-    public Response listarStatusAgendamento(@PathParam("id") Long id) {
+    public Response listarPorId(Long id) {
         Optional<StatusAgendamento> status = StatusAgendamento.findByIdOptional(id);
 
         if (status.isEmpty()) {
@@ -38,10 +31,8 @@ public class StatusAgendamentoResource {
         return Response.ok(status.get()).build();
     }
 
-    @PUT
-    @Path("/{id}")
     @Transactional
-    public Response atualizarStatusAgendamento(@PathParam("id") Long id, StatusAgendamento statusAtualizado) {
+    public Response atualizarPorId(Long id, StatusAgendamento statusAtualizado) {
         StatusAgendamento statusExistente = StatusAgendamento.findById(id);
 
         if (statusExistente == null) {
@@ -54,10 +45,8 @@ public class StatusAgendamentoResource {
         return Response.ok(statusExistente).build();
     }
 
-    @DELETE // HTTP DELETE para remover um recurso
-    @Path("/{id}")
     @Transactional
-    public Response deletarStatusAgendamento(@PathParam("id") Long id) {
+    public Response deletarPorId(Long id) {
         StatusAgendamento status = StatusAgendamento.findById(id);
 
         if (status == null) {

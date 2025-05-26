@@ -2,12 +2,9 @@ package org.clinicaOndot.operador;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
 import org.clinicaOndot.agendamento.Agendamento;
-import org.clinicaOndot.paciente.Paciente;
-import org.clinicaOndot.paciente.PacienteRequestDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +12,7 @@ import java.util.Optional;
 @RequestScoped
 public class OperadorResource {
 
-    public Response criar(OperadorRequestDto request) {
+    public Response criar(@Valid OperadorRequestDto request) {
         Operador operador = new Operador();
         operador.setAtivo(true);
         operador.setNomeCompleto(request.getNomeCompleto());
@@ -41,7 +38,7 @@ public class OperadorResource {
     }
 
     @Transactional
-    public Response atualizarPorId(Long id, OperadorRequestDto request) {
+    public Response atualizarPorId(Long id, @Valid OperadorRequestDto request) {
         Operador operadorExistente = Operador.findById(id);
 
         if (operadorExistente == null) {

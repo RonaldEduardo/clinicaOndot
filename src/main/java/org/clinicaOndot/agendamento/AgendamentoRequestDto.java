@@ -1,6 +1,8 @@
 package org.clinicaOndot.agendamento;
 
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,15 +13,15 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 public class AgendamentoRequestDto {
-    // Data e hora do agendamento
+    @NotNull
+    @Future
     public LocalDateTime dataHora;
-    // Observações, que podem ser opcionais
     public String observacoes;
-    //
+    @NotNull
     public Long pacienteId;
-    //
+    @NotNull
     public Long operadorId;
-    //
+    @NotNull
     public Long statusAgendamentoId;
 
 

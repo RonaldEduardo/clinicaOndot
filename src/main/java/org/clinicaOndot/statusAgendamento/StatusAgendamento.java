@@ -2,6 +2,7 @@ package org.clinicaOndot.statusAgendamento;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,7 @@ public class StatusAgendamento extends PanacheEntityBase {
     private Long id;
 
     @Column(name = "descricao", nullable = false, length = 20)
+    @NotNull(message = "campo descrição é obrigatorio")
     private String descricao;
 
     // Construtor vazio

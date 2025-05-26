@@ -2,6 +2,7 @@ package org.clinicaOndot.paciente;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
 import org.clinicaOndot.agendamento.Agendamento;
 
@@ -11,7 +12,7 @@ import java.util.Optional;
 @RequestScoped
 public class PacienteResource {
     @Transactional
-    public Response criar(PacienteRequestDto request) {
+    public Response criar(@Valid PacienteRequestDto request) {
         Paciente paciente = new Paciente();
         paciente.setAtivo(true);
         paciente.setNomeCompleto(request.getNomeCompleto());
@@ -37,7 +38,7 @@ public class PacienteResource {
     }
 
     @Transactional
-    public Response atualizarPorId(Long id, PacienteRequestDto request) {
+    public Response atualizarPorId(Long id,@Valid PacienteRequestDto request) {
         Paciente pacienteExistente = Paciente.findById(id);
 
         if (pacienteExistente == null) {

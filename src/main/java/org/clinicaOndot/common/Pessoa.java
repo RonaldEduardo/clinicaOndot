@@ -7,6 +7,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -22,8 +25,13 @@ public abstract class Pessoa extends PanacheEntityBase {
     private Long id;
 
     @Column(name = "nome_completo", length = 100, nullable = false)
+    @NotBlank(message = "O nome de usuário é obrigatório.")
+    @Size(min = 4, message = "O nome de usuário deve ter no minimo 4 letras")
     private String nomeCompleto;
 
+    @NotBlank(message = "O documento é obrigatorio")
+    @Size(max = 14, message = "O documento deve conter 14 caracteres")
+    @Pattern(regexp = "\\S+", message = "O documento não pode conter espaços.") // Exemplo de regex genérica
     @Column(unique = true, length = 14)
     private String documento;
 

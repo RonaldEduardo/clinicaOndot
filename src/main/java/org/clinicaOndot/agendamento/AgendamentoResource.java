@@ -2,6 +2,7 @@ package org.clinicaOndot.agendamento;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.transaction.Transactional; // Importe para garantir operações de DB dentro de uma transação
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*; // Importe as anotações JAX-RS
 import jakarta.ws.rs.core.Response; // Para retornar respostas HTTP
 import org.clinicaOndot.paciente.Paciente;
@@ -13,7 +14,7 @@ import java.util.Optional; // Para lidar com a possibilidade de não encontrar u
 @RequestScoped
 public class AgendamentoResource {
     @Transactional
-    public Response criar(AgendamentoRequestDto request) {
+    public Response criar(@Valid AgendamentoRequestDto request) {
         Paciente paciente = Paciente.findById(request.getPacienteId());
         if (paciente == null) {
             // Se o paciente não for encontrado, retorna um erro 400 Bad Request
@@ -53,7 +54,7 @@ public class AgendamentoResource {
     }
 
     @Transactional
-    public Response atualizar(Long id, AgendamentoRequestDto request) {
+    public Response atualizar(Long id,@Valid AgendamentoRequestDto request) {
         Agendamento agendamentoExistente = Agendamento.findById(id);
 
         if (agendamentoExistente == null) {
