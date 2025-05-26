@@ -1,34 +1,36 @@
 package org.clinicaOndot.operador;
 
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.clinicaOndot.agendamento.Agendamento;
+import org.clinicaOndot.paciente.Paciente;
+import org.clinicaOndot.paciente.PacienteRequestDto;
 
 import java.util.List;
 import java.util.Optional;
 
-@Path("/operadores")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class OperadorResource {
-    @POST
-    @Transactional
-    public Response criarOperador(Operador operador) {
+
+    public Response criar(OperadorRequestDto request) {
+        Operador operador = new Operador();
+        operador.setAtivo(true);
+        operador.setNomeCompleto(request.getNomeCompleto());
+        operador.setDocumento(request.getDocumento());
+
         operador.persist();
 
         return Response.status(Response.Status.CREATED).build();
     }
 
-    @GET
-    public List<Operador> listarOperadores() {
+    public List<Operador> listar() {
         return Operador.listAll();
     }
 
-    @GET
-    @Path("/{id}")
-    public Response listarOperador(@PathParam("id") Long id) {
+    public Response listarPorId(Long id) {
         Optional<Operador> operador = Operador.findByIdOptional(id);
 
         if (operador.isEmpty()) {
@@ -38,10 +40,8 @@ public class OperadorResource {
         return Response.ok(operador.get()).build();
     }
 
-    @PUT
-    @Path("/{id}")
     @Transactional
-    public Response atualizarOperador(@PathParam("id") Long id, Operador operadorAtualizado) {
+    public Response atualizarPorId(Long id, OperadorRequestDto request) {
         Operador operadorExistente = Operador.findById(id);
 
         if (operadorExistente == null) {
@@ -49,16 +49,13 @@ public class OperadorResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        operadorExistente.setNomeCompleto(operadorAtualizado.getNomeCompleto());
-        operadorExistente.setDocumento(operadorAtualizado.getDocumento());
+        validaRequest(request, operadorExistente);
         // Não precisa de persist() aqui pois o Panache gerencia dentro da transação
         return Response.ok(operadorExistente).build();
     }
 
-    @DELETE // HTTP DELETE para remover um recurso
-    @Path("/{id}")
     @Transactional
-    public Response deletarOperador(@PathParam("id") Long id) {
+    public Response deletarPorId(Long id) {
         Operador operador = Operador.findById(id);
 
         if (operador == null) {
@@ -76,5 +73,15 @@ public class OperadorResource {
         // Se não houver agendamentos, realizar a exclusão física
         operador.delete(); // Exclusão física usando Panache
         return Response.noContent().build(); // Retorna 204 No Content para sucesso de exclusão
+    }
+
+    private static void validaRequest(OperadorRequestDto request, Operador operadorExistente) {
+        if(request.getNomeCompleto() != null){
+            operadorExistente.setNomeCompleto(request.getNomeCompleto());
+        }
+
+        if(request.getDocumento() != null){
+            operadorExistente.setDocumento(request.getDocumento());
+        }
     }
 }
