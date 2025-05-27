@@ -1,57 +1,56 @@
 package org.clinicaOndot.paciente;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
 import org.clinicaOndot.agendamento.Agendamento;
+import org.clinicaOndot.operador.Operador;
 
 import java.util.List;
 import java.util.Optional;
 
 @RequestScoped
 public class PacienteResource {
+    @Inject
+    PacienteRepository pacienteRepository;
+
     @Transactional
-    public Response criar(@Valid PacienteRequestDto request) {
+    public Paciente criar(@Valid PacienteRequestDto request) {
         Paciente paciente = new Paciente();
         paciente.setAtivo(true);
         paciente.setNomeCompleto(request.getNomeCompleto());
         paciente.setDocumento(request.getDocumento());
 
-        paciente.persist();
+        pacienteRepository.persist(paciente);
 
-        return Response.status(Response.Status.CREATED).build();
+        return paciente;
     }
 
     public List<Paciente> listarTodos() {
-        return Paciente.listAll();
+        return pacienteRepository.listAll();
     }
 
-    public Response listarPorId(Long id) {
-        Optional<Paciente> paciente = Paciente.findByIdOptional(id);
-
-        if (paciente.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        return Response.ok(paciente.get()).build();
+    public Optional<Paciente> listarPorId(Long id) {
+        return pacienteRepository.findByIdOptional(id);
     }
 
     @Transactional
-    public Response atualizarPorId(Long id,@Valid PacienteRequestDto request) {
-        Paciente pacienteExistente = Paciente.findById(id);
+    public Optional<Paciente> atualizarPorId(Long id,@Valid PacienteRequestDto pacienteRequestDto) {
+        Optional<Paciente> pacienteExistenteOpt = pacienteRepository.findByIdOptional(id);
 
-        if (pacienteExistente == null) {
-            // Se não encontrou, retorna 404 Not Found
-            return Response.status(Response.Status.NOT_FOUND).build();
+        if (pacienteExistenteOpt.isEmpty()) {
+            // Se não encontrou, retorna false
+            return Optional.empty();
         }
-        validaRequest(request, pacienteExistente);
+        Paciente pacienteExistente = pacienteExistenteOpt.get();
+        atualizaDados(pacienteRequestDto, pacienteExistente);
 
-        // Não precisa de persist() aqui pois o Panache gerencia dentro da transação
-        return Response.ok(pacienteExistente).build();
+        return Optional.of(pacienteExistente);
     }
 
-    private static void validaRequest(PacienteRequestDto request, Paciente pacienteExistente) {
+    private static void atualizaDados(PacienteRequestDto request, Paciente pacienteExistente) {
         if(request.getNomeCompleto() != null){
             pacienteExistente.setNomeCompleto(request.getNomeCompleto());
         }
@@ -62,24 +61,8 @@ public class PacienteResource {
     }
 
     @Transactional
-    public Response deletarPorId(Long id) {
-        Paciente paciente = Paciente.findById(id);
-
-        if (paciente == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        long agendamentosVinculados = Agendamento.count("paciente", paciente);
-
-        if (agendamentosVinculados > 0) {
-            // Se houver agendamentos, desativar o paciente (soft delete)
-            paciente.setAtivo(false); // Altera o status para inativo
-            // O Hibernate salva automaticamente a mudança porque estamos em uma transação
-            return Response.ok("Paciente desativado. Existem " + agendamentosVinculados + " agendamento(s) vinculado(s).").build();
-        }
-        // Se não houver agendamentos, realizar a exclusão física
-        paciente.delete(); // Exclusão física usando Panache
-        return Response.noContent().build(); // Retorna 204 No Content para sucesso de exclusão
+    public boolean deletarPorId(Long id) {
+        return pacienteRepository.deleteById(id);
     }
 
 

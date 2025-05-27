@@ -6,6 +6,8 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
 import org.clinicaOndot.agendamento.Agendamento;
+import org.clinicaOndot.agendamento.AgendamentoRequestDto;
+import org.clinicaOndot.agendamento.status.AgendamentoStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,72 +17,50 @@ public class OperadorResource {
     @Inject
     OperadorRepository operadorRepository;
 
-    public void criar(@Valid OperadorRequestDto request) {
+    public Operador criar(@Valid OperadorRequestDto request) {
         Operador operador = new Operador();
         operador.setAtivo(true);
         operador.setNomeCompleto(request.getNomeCompleto());
         operador.setDocumento(request.getDocumento());
 
-        //operador.persist();
         operadorRepository.persist(operador);
+
+        return operador;
     }
 
     public List<Operador> listar() {
-        return Operador.listAll();
+        return operadorRepository.listAll();
     }
 
-    public Response listarPorId(Long id) {
-        Optional<Operador> operador = Operador.findByIdOptional(id);
-
-        if (operador.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        return Response.ok(operador.get()).build();
+    public Optional<Operador> listarPorId(Long id) {
+        return operadorRepository.findByIdOptional(id);
     }
 
     @Transactional
-    public Response atualizarPorId(Long id, @Valid OperadorRequestDto request) {
-        Operador operadorExistente = Operador.findById(id);
+    public Optional<Operador> atualizarPorId(Long id, @Valid OperadorRequestDto operadorRequestDto) {
+        Optional<Operador> operadorExistenteOpt = operadorRepository.findByIdOptional(id);
 
-        if (operadorExistente == null) {
-            // Se não encontrou, retorna 404 Not Found
-            return Response.status(Response.Status.NOT_FOUND).build();
+        if (operadorExistenteOpt.isEmpty()) {
+            // Se não encontrou, retorna false
+            return Optional.empty();
         }
+        Operador operadorExistente = operadorExistenteOpt.get();
+        atualizaDados(operadorRequestDto, operadorExistente);
 
-        validaRequest(request, operadorExistente);
-        // Não precisa de persist() aqui pois o Panache gerencia dentro da transação
-        return Response.ok(operadorExistente).build();
+        return Optional.of(operadorExistente);
     }
 
-    @Transactional
-    public Response deletarPorId(Long id) {
-        Operador operador = Operador.findById(id);
-
-        if (operador == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        long agendamentosVinculados = Agendamento.count("operador", operador);
-
-        if (agendamentosVinculados > 0) {
-            operador.setAtivo(false); // Altera o status para inativo
-            // O Hibernate salva automaticamente a mudança porque estamos em uma transação
-            return Response.ok("Operador desativado. Existem " + agendamentosVinculados + " agendamento(s) vinculado(s).")
-                    .build();
-        }
-        // Se não houver agendamentos, realizar a exclusão física
-        operador.delete(); // Exclusão física usando Panache
-        return Response.noContent().build(); // Retorna 204 No Content para sucesso de exclusão
-    }
-
-    private static void validaRequest(OperadorRequestDto request, Operador operadorExistente) {
-        if(request.getNomeCompleto() != null){
+    private static void atualizaDados(OperadorRequestDto request, Operador operadorExistente) {
+        if (request.getNomeCompleto() != null) { // Adicionamos esta verificação!
             operadorExistente.setNomeCompleto(request.getNomeCompleto());
         }
-
-        if(request.getDocumento() != null){
+        if (request.getDocumento() != null) { // Opcional: fazer o mesmo para observacoes se ela também puder ser nula na requisição
             operadorExistente.setDocumento(request.getDocumento());
         }
+    }
+
+    @Transactional
+    public boolean deletarPorId(Long id) {
+        return operadorRepository.deleteById(id);
     }
 }

@@ -33,18 +33,25 @@ public class OperadorService {
     @GET
     @Path("/{id}")
     public Response listarOperador(@PathParam("id") Long id) {
-        return operadorResource.listarPorId(id);
+        Optional<Operador> operador = operadorResource.listarPorId(id);
+        return Response.ok(operador.get()).build();
     }
 
     @PUT
     @Path("/{id}")
     public Response atualizarOperador(@PathParam("id") Long id, OperadorRequestDto request) {
-        return operadorResource.atualizarPorId(id, request);
+        return operadorResource.atualizarPorId(id, request)
+                .map(operador -> Response.ok(operador).build())
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
 
     @DELETE // HTTP DELETE para remover um recurso
     @Path("/{id}")
     public Response deletarOperador(@PathParam("id") Long id) {
-        return operadorResource.deletarPorId(id);
+        boolean deletado = operadorResource.deletarPorId(id);
+        if (!deletado) {
+            return Response.status(Response.Status.NOT_FOUND).build(); // Não encontrado
+        }
+        return Response.status(Response.Status.NO_CONTENT).build(); // Sucesso, sem conteúdo
     }
 }

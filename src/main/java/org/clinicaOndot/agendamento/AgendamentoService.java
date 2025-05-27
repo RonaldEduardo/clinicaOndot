@@ -31,7 +31,7 @@ public class AgendamentoService {
 
     @GET
     @Path("/{id}")
-    public Response buscarAgendamentoPorId(@PathParam("id") Long id) {
+    public Response ListarAgendamentoPorId(@PathParam("id") Long id) {
         Optional<Agendamento> agendamento = agendamentoResource.buscarPorId(id);
         return Response.ok(agendamento.get()).build();
     }

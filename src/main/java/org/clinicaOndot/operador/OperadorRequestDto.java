@@ -9,13 +9,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OperadorRequestDto {
-    @NotBlank(message = "O nome de usuário é obrigatório.")
-    @Size(min = 4, message = "O nome de usuário deve ter no minimo 4 letras")
+    @NotBlank
     public String nomeCompleto;
 
-    @NotBlank(message = "O documento é obigatorio")
-    @Size(max = 14, message = "O documento deve conter 14 caracteres")
-    @Pattern(regexp = "\\S+", message = "O documento não pode conter espaços.") // Exemplo de regex genérica
+    @NotBlank
+    @Pattern(regexp = "\\S+") // Exemplo de regex genérica
     public String documento;
     //
     public boolean ativo;
