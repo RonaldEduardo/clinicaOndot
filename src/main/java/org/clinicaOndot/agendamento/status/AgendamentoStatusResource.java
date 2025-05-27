@@ -1,5 +1,6 @@
 package org.clinicaOndot.agendamento.status;
 
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -7,7 +8,7 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 
-
+@RequestScoped
 public class AgendamentoStatusResource {
     @Inject
     AgendamentoStatusRepository agendamentoStatusRepository;

@@ -1,6 +1,8 @@
 package org.clinicaOndot.agendamento;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.RequestScoped;
 
-public class AgendamentoRepository implements PanacheRepository<Agendamento> {
+@RequestScoped
+public interface AgendamentoRepository extends PanacheRepository<Agendamento> {
 }
